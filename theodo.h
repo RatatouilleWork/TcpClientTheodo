@@ -61,30 +61,31 @@ private:
     QString m_feedBack;
     QStringList m_feedbackHeader;
     QStringList m_feedbackData;
+	QString m_lastCmd;
 
 // Signals and slots:
 signals:
    void cmdSent(QString cmd);
-   void theodoReady();
 
 public slots:
-    int getFeedBack(QString feedBack);
+    int set_m_feedBack(QString feedBack);
 
 // Theodolite functions:
 public:
-    int AUS_SetUserLockStat(_Switch onSwitch);
-    int AUT_SetSearchArea(double dCenterH, double dCenterV, double dRangeH, double dRangeV, _isEnable bEnable);
-    int AUT_PS_EnableRange(_isEnable bEnable);
+    int AUS_SetUserLockStat(_Switch onSwitch = ON);
+    int AUT_SetSearchArea(double dCenterH, double dCenterV, double dRangeH, double dRangeV, _isEnable bEnable = ENABLE);
+    int AUT_PS_EnableRange(_isEnable bEnable = ENABLE);
     int AUT_PS_SearchWindow();
     int AUT_LockIn();
-    int BAP_MeasDistanceAngle(_BAP_MEASURE_PROG DistMode, double& angleH, double&angleV, double& distance, uint& feedbackDistMode);
+    int BAP_MeasDistanceAngle(_BAP_MEASURE_PROG DistMode = BAP_DEF_DIST);
 
 // Member methods:
 public:
     int parseFeedback();
-    void get_m_feedBack(QString& feedBack);
-    void get_m_feedBackHeader(QStringList& feedBackHeader);
-    void get_m_feedBackData(QStringList& feedBackData);
+    QString get_m_feedBack();
+    QStringList get_m_feedBackHeader();
+    QStringList get_m_feedBackData();
+	QString get_m_lastCmd();
 
 };
 

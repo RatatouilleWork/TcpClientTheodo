@@ -8,7 +8,7 @@ Theodo::Theodo(QObject *parent) : QObject(parent)
 
 // 操作函数
 
-int Theodo::AUS_SetUserLockStat(_Switch onSwitch = Theodo::ON)
+int Theodo::AUS_SetUserLockStat(_Switch onSwitch )
 {
     m_Cmd.clear();
 
@@ -21,22 +21,57 @@ int Theodo::AUS_SetUserLockStat(_Switch onSwitch = Theodo::ON)
         m_Cmd = "%R1Q,18007:0\r\n";
     }
 
-    emit cmdSent(QString(__FUNCTION__));
+    //emit cmdSent(QString(__FUNCTION__));
+	m_lastCmd = __FUNCTION__;
 
 
     return 0;
 }
 
+int Theodo::AUT_SetSearchArea(double dCenterH, double dCenterV, double dRangeH, double dRangeV, _isEnable bEnable)
+{
+	m_Cmd = "%R1Q,9043:" + QString::number(dCenterH) + "," + QString::number(dCenterV) + "," + QString::number(dRangeH) + "," + QString::number(dRangeV) + "," + QString::number(bEnable) + "\r\n";
+	m_lastCmd = __FUNCTION__;
+	return 0;
+}
+
+int Theodo::AUT_PS_EnableRange(_isEnable bEnable)
+{
+	m_Cmd = "%R1Q,9048:" + QString::number(bEnable) + "\r\n";
+	m_lastCmd = __FUNCTION__;
+	return 0;
+}
+
+int Theodo::AUT_PS_SearchWindow()
+{
+
+	m_Cmd = QString("%R1Q,9052:")  + QString("\r\n");
+	m_lastCmd = __FUNCTION__;
+	return 0;
+}
+
+int Theodo::AUT_LockIn()
+{
+	m_Cmd = QString("%R1Q,9013:")  + QString("\r\n");
+	m_lastCmd = __FUNCTION__;
+	return 0;
+}
+
+int Theodo::BAP_MeasDistanceAngle(_BAP_MEASURE_PROG DistMode)
+{
+	m_Cmd = "%R1Q,17017:" + QString::number(DistMode) +  "\r\n";
+	m_lastCmd = __FUNCTION__;
+	return 0;
+}
+
 // 辅助函数
 
-int Theodo::getFeedBack(QString feedBack)
+int Theodo::set_m_feedBack(QString feedBack)
 {
     m_feedBack.clear();
     m_feedBack = feedBack;
-    qDebug()<<__LINE__<<__FILE__<<__FUNCTION__<<feedBack;
-    qDebug()<<__LINE__<<__FILE__<<__FUNCTION__<<m_feedBack;
 
-    emit theodoReady();
+    //emit theodoReady();
     return 0;
 }
 
@@ -44,41 +79,46 @@ int Theodo::parseFeedback()
 {
     if(m_feedBack.isEmpty())
     {
-        qDebug()<<"empty string";
         return -1;
     }
     QStringList respond = m_feedBack.split(':');
-    qDebug()<<__LINE__<<__FILE__<<__FUNCTION__<<respond;
-    qDebug()<<__LINE__<<__FILE__<<__FUNCTION__<<respond[0];
-    qDebug()<<__LINE__<<__FILE__<<__FUNCTION__<<respond[1];
-    m_feedbackHeader.clear();
-    m_feedbackHeader = respond[0].split(',');
-    qDebug()<<__LINE__<<__FILE__<<__FUNCTION__<<m_feedbackHeader;
-    m_feedbackData.clear();
-    m_feedbackData = respond[1].split(',');
-    qDebug()<<__LINE__<<__FILE__<<__FUNCTION__<<m_feedbackData;
-    int ret = m_feedbackData[0].toInt();
+	if (respond[0] == "%R1P,0,0" )
+	{
+		m_feedbackHeader.clear();
+		m_feedbackHeader = respond[0].split(',');
+		m_feedbackData.clear();
+		m_feedbackData = respond[1].split(',');
 
-    return ret;
+		int ret = m_feedbackData[0].toInt();
+		return ret;
+	}
+	else
+	{
+		qDebug() << "not theodolite respond!";
+		return -1;
+	}
+
+    return 0;
 
 }
 
-void Theodo::get_m_feedBack(QString& feedBack)
+QString Theodo::get_m_feedBack()
 {
-    feedBack = m_feedBack;
-    return;
+	return m_feedBack;
 }
 
-void Theodo::get_m_feedBackHeader(QStringList& feedBackHeader)
+QStringList Theodo::get_m_feedBackHeader()
 {
-    feedBackHeader = m_feedbackHeader;
-    return;
+	return  m_feedbackHeader;
 }
 
-void Theodo::get_m_feedBackData(QStringList& feedBackData)
+QStringList Theodo::get_m_feedBackData()
 {
-    feedBackData = m_feedbackData;
-    return;
+	return m_feedbackData;
+}
+QString Theodo::get_m_lastCmd()
+{
+	return m_lastCmd;
 }
 //
 

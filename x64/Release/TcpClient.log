@@ -1,0 +1,15 @@
+﻿  Generate moc_predefs.h
+  Moc'ing dtuoperation.h...
+  Moc'ing tcpclient.h...
+  Moc'ing theodo.h...
+  Moc'ing theodooperation.h...
+  dtuoperation.cpp
+  main.cpp
+  tcpclient.cpp
+  theodo.cpp
+  theodooperation.cpp
+  moc_dtuoperation.cpp
+  moc_tcpclient.cpp
+  moc_theodo.cpp
+  moc_theodooperation.cpp
+  TcpClient.vcxproj -> D:\PROJ\TcpClient\release\TcpClient.exe

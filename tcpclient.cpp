@@ -5,7 +5,7 @@ TcpClient::TcpClient(QObject *parent) : QObject(parent)
     bool ok = false;
     m_socket = new QTcpSocket(this);
     m_socket->open(QIODevice::ReadWrite);
-    m_socket->connectToHost("127.0.0.1", 10086);
+    m_socket->connectToHost(QHostAddress::LocalHost, 10000);
     ok = m_socket->waitForConnected();
     if(false == ok)
     {
@@ -13,13 +13,28 @@ TcpClient::TcpClient(QObject *parent) : QObject(parent)
     }
 }
 
-void TcpClient::read_data()
+
+
+TcpClient::TcpClient(quint16 port)
+{
+    bool ok = false;
+    m_socket = new QTcpSocket(this);
+    m_socket->open(QIODevice::ReadWrite);
+    m_socket->connectToHost(QHostAddress::Any, port);
+    ok = m_socket->waitForConnected();
+    if(false == ok)
+    {
+        qDebug()<<"error";
+    }
+
+}
+
+void TcpClient::read_data(QString& respond)
 {
     m_socket->waitForReadyRead();
-    QString msg;
-    msg = m_socket->readAll();
+    respond = m_socket->readAll();
 
-    qDebug()<<msg;
+    qDebug()<<__LINE__<<__FUNCTION__<<respond;
 }
 
 void TcpClient::write_data(QString msg)
