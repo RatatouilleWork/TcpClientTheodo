@@ -18,6 +18,7 @@ public:
 signals:
 
 public slots:
+    void slot_connected();
 
 public:
 	int DTU_init(QHostAddress IP_addr, quint16 port);

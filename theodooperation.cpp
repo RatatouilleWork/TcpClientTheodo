@@ -3,7 +3,7 @@
 TheodoOperation::TheodoOperation(QObject *parent) : QObject(parent)
 {
 	m_DTUoperation = new DTUOperation(this);
-	m_DTUoperation->DTU_init(QHostAddress("127.0.0.1"), 10000);
+    m_DTUoperation->DTU_init(QHostAddress("192.168.1.1"), 10010);
 
 
 }
@@ -58,14 +58,19 @@ int TheodoOperation::op_Theodo(Theodo& in_theodo, int(Theodo::*bap_meas_distance
 		{
 		case 0:
 			out_dist_mode = Theodo::BAP_NO_MEAS;
+            break;
 		case 1:
 			out_dist_mode = Theodo::BAP_NO_DIST;
+            break;
 		case 2:
 			out_dist_mode = Theodo::BAP_DEF_DIST;
+            break;
 		case 5:
 			out_dist_mode = Theodo::BAP_CLEAR_DIST;
+            break;
 		case 6:
 			out_dist_mode = Theodo::BAP_STOP_TRK;
+            break;
 		}
 	}
 	
