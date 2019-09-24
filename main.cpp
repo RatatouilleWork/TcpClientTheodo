@@ -1,7 +1,4 @@
 #include <QCoreApplication>
-#include <tcpclient.h>
-#include "dtuoperation.h"
-#include "theodo.h"
 #include "theodooperation.h"
 #include <iostream>
 

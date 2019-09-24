@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+    <html>
+    <head>
+        <meta http-equiv="Content-type" content="text/html;charset=UTF-8">
+        <title>Theodooperation 类使用说明</title>
+        
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/markdown.css">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/Microsoft/vscode/extensions/markdown-language-features/media/highlight.css">
+        
+        <style>
+.task-list-item { list-style-type: none; } .task-list-item-checkbox { margin-left: -20px; vertical-align: middle; }
+</style>
+        <style>
+            body {
+                font-family: -apple-system, BlinkMacSystemFont, 'Segoe WPC', 'Segoe UI', 'Ubuntu', 'Droid Sans', sans-serif;
+                font-size: 14px;
+                line-height: 1.6;
+            }
+        </style>
+        
+        
+    </head>
+    <body>
+        <p>[toc]</p>
+<h1 id="theodooperation-%e7%b1%bb%e4%bd%bf%e7%94%a8%e8%af%b4%e6%98%8e">Theodooperation 类使用说明</h1>
+<h2 id="%e6%91%98%e8%a6%81">摘要：</h2>
+<p>TheodoOperation的作用是通过本类的成员方法自动操作Leica系列全站仪，本类中的方法是通过将Leica GeoCom工具包中的ASCII命令进行二次封装，并通过TCP方式发送。</p>
+<p>为保证本类对象的正常运行，项目中须包含以下依赖：</p>
+<ul>
+<li>Theodo 类（theodo.h, theodo.cpp)；</li>
+<li>DTUOperation 类(dtuoperation.h, dtuoperation.cpp)；</li>
+</ul>
+<p>Theodo 类描述了全站仪对象，包括：</p>
+<ul>
+<li>参照Leica GeoCom参考手册定义的宏 (详见theodo.h)；</li>
+<li>参照Leica GeoCom参考手册定义的枚举 (详见theodo.h)；</li>
+<li>参照Leica GeoCom参考手册定义的操作命令方法 (详见theodo.h)；</li>
+</ul>
+<p>以及必要的私有成员属性及方法；</p>
+<p>DTUOperation 类描述了于全站仪的通讯方式：</p>
+<ul>
+<li>定义TCP client对象，用以于服务器通信；</li>
+<li>定义了初始化，以及读写socket的函数；</li>
+</ul>
+<p>当前版本仅支持TCP/IP方式通讯，DTU作为TCP Server，本类之对象作为TCP Client;</p>
+<p>程序设计语言为 C++ (std=C++11);<br>
+使用QT (Version = 5.13.1) 开源框架；</p>
+<h2 id="1-%e4%bd%bf%e7%94%a8%e6%ad%a5%e9%aa%a4">1. 使用步骤：</h2>
+<h3 id="11%e4%bd%bf%e7%94%a8%e6%93%8d%e4%bd%9c%e5%af%b9%e8%b1%a1%e7%9a%84%e6%96%b9%e6%b3%95%e6%93%8d%e4%bd%9c%e5%85%a8%e7%ab%99%e4%bb%aa%e5%af%b9%e8%b1%a1">1.1使用操作对象的方法操作全站仪对象:</h3>
+<ul>
+<li>构造全站仪对象；</li>
+<li>构造操作函数对象；</li>
+<li>直接输入操作命令和参数；</li>
+</ul>
+<h3 id="12-%e6%9e%84%e9%80%a0%e6%96%b9%e6%b3%95">1.2 构造方法：</h3>
+<p>请在应用代码中包含以下头文件：</p>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"theodooperation.h"</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"theodo.h"</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"dtuoperation.h"</span></span>
+</div></code></pre>
+<ul>
+<li>构造全站仪对象的方法：</li>
+</ul>
+<pre><code class="language-C++"><div>Theodo TS60;
+</div></code></pre>
+<ul>
+<li>构造操作对象的方法：</li>
+</ul>
+<pre><code class="language-C++"><div>TheodoOperation op;
+</div></code></pre>
+<h3 id="13-%e4%bd%bf%e7%94%a8%e6%88%90%e5%91%98%e6%96%b9%e6%b3%95%e8%bf%9b%e8%a1%8c%e6%93%8d%e4%bd%9c">1.3 使用成员方法进行操作：</h3>
+<h4 id="131-theodo-%e6%88%90%e5%91%98%e5%b1%9e%e6%80%a7%e6%96%b9%e6%b3%95%e4%bb%8b%e7%bb%8d">1.3.1 Theodo 成员属性/方法介绍：</h4>
+<p>当前版本定义的宏：</p>
+<pre><code class="language-C++"><div>    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_OK = <span class="hljs-number">0</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_NOT_IMPL = <span class="hljs-number">5</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_NA = <span class="hljs-number">27</span>;
+
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_AUT_SIDECOVER_ERR = <span class="hljs-number">8723</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_AUT_NO_WORKING_AREA = <span class="hljs-number">8720</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_AUT_NOTARGET = <span class="hljs-number">8710</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_AUT_MOTOR_ERROR = <span class="hljs-number">8707</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_AUT_DETECTOR_ERROR = <span class="hljs-number">8713</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_AUT_NO_TARGET = <span class="hljs-number">517</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_AUT_BAD_ENVIRONMENT = <span class="hljs-number">8712</span>;
+    <span class="hljs-keyword">static</span> <span class="hljs-keyword">const</span> uint GRC_ATA_STRANGE_LIGHT = <span class="hljs-number">524</span>;
+</div></code></pre>
+<p>当前版本定义的枚举：</p>
+<pre><code class="language-C++"><div>    <span class="hljs-comment">// 开关:</span>
+    <span class="hljs-keyword">enum</span> _Switch
+    {
+        OFF = <span class="hljs-number">0</span>,
+        ON = <span class="hljs-number">1</span>
+    }Switch;
+
+    <span class="hljs-comment">// 使能:</span>
+    <span class="hljs-keyword">enum</span> _isEnable
+    {
+        DISABLE = <span class="hljs-number">0</span>,
+        ENABLE = <span class="hljs-number">1</span>
+    }isEnable;
+
+    <span class="hljs-comment">// 测量方法:</span>
+    <span class="hljs-keyword">enum</span> _BAP_MEASURE_PROG
+    {
+        BAP_NO_MEAS = <span class="hljs-number">0</span>,
+        BAP_NO_DIST = <span class="hljs-number">1</span>,
+        BAP_DEF_DIST = <span class="hljs-number">2</span>,
+
+        BAP_CLEAR_DIST = <span class="hljs-number">5</span>,
+        BAP_STOP_TRK = <span class="hljs-number">6</span>
+    }BAP_MEASURE_PROG;
+</div></code></pre>
+<p>当前版本中实现的方法：</p>
+<hr>
+<pre><code class="language-C++"><div>    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">AUS_SetUserLockStat</span><span class="hljs-params">(_Switch onSwitch = ON)</span></span>;  
+    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">AUT_SetSearchArea</span><span class="hljs-params">(<span class="hljs-keyword">double</span> dCenterH, <span class="hljs-keyword">double</span> dCenterV, <span class="hljs-keyword">double</span> dRangeH, <span class="hljs-keyword">double</span> dRangeV, _isEnable bEnable = ENABLE)</span></span>;
+    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">AUT_PS_EnableRange</span><span class="hljs-params">(_isEnable bEnable = ENABLE)</span></span>;
+    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">AUT_PS_SearchWindow</span><span class="hljs-params">()</span></span>;
+    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">AUT_LockIn</span><span class="hljs-params">()</span></span>;
+    <span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">BAP_MeasDistanceAngle</span><span class="hljs-params">(_BAP_MEASURE_PROG DistMode = BAP_DEF_DIST)</span></span>;
+</div></code></pre>
+<hr>
+<p>方法：int AUS_SetUserLockStat(_Switch onSwitch = ON);<br>
+功能： 设置全站仪为跟踪方式；<br>
+输入参数：</p>
+<pre><code class="language-C++"><div>    Theodo::_Switch onSwitch; <span class="hljs-comment">//ON = 打开 OFF = 关闭</span>
+</div></code></pre>
+<p>输出参数： 无；</p>
+<hr>
+<p>方法：
+int AUT_SetSearchArea(double dCenterH, double dCenterV, double dRangeH, double dRangeV, _isEnable bEnable = ENABLE);<br>
+功能： 设置搜索区域；<br>
+输入参数：</p>
+<pre><code class="language-C++"><div>    <span class="hljs-keyword">double</span> dCenterH; <span class="hljs-comment">//水平方向中心点：rad</span>
+    <span class="hljs-keyword">double</span> dCenterV; <span class="hljs-comment">//垂直方向中心点：rad</span>
+    <span class="hljs-keyword">double</span> dRangeH; <span class="hljs-comment">//水平方向扫描范围：rad</span>
+    <span class="hljs-keyword">double</span> dRangeV; <span class="hljs-comment">//垂直方向扫描范围：rad</span>
+    Theodo::_isEnable bEnable; <span class="hljs-comment">//使能</span>
+</div></code></pre>
+<p>输出参数： 无；</p>
+<hr>
+<p>方法：
+int AUT_PS_EnableRange(_isEnable bEnable = ENABLE);<br>
+功能： 使能超级搜索；<br>
+输入参数：</p>
+<pre><code class="language-C++"><div>    Theodo::_isEnable bEnable <span class="hljs-comment">//ENABLE = 使能 DISABLE = 禁用</span>
+</div></code></pre>
+<p>输出参数： 无；</p>
+<hr>
+<p>方法：
+int AUT_PS_SearchWindow();<br>
+功能： 进行超级搜索；<br>
+输入参数： 无；<br>
+输出参数： 无；</p>
+<hr>
+<p>方法：
+int AUT_LockIn();<br>
+功能： 设置自动跟踪棱镜；<br>
+输入参数： 无；<br>
+输出参数： 无；</p>
+<hr>
+<p>方法：
+int BAP_MeasDistanceAngle(_BAP_MEASURE_PROG DistMode = BAP_DEF_DIST);<br>
+功能： 设置自动跟踪棱镜；<br>
+输入参数：</p>
+<pre><code class="language-C++"><div>    Theodo::_BAP_MEASURE_PROG
+        <span class="hljs-comment">// BAP_NO_MEAS : 不进行测量；</span>
+        <span class="hljs-comment">// BAP_NO_DIST : 仅测量角度；</span>
+        <span class="hljs-comment">// BAP_DEF_DIST : 测量角度和距离；</span>
+        <span class="hljs-comment">// BAP_CLEAR_DIST : 清楚距离；</span>
+        <span class="hljs-comment">// BAP_STOP_TRK = 6 : 停止跟踪；</span>
+</div></code></pre>
+<p>输出参数： 无</p>
+<hr>
+<h4 id="132-theodooperation-%e6%88%90%e5%91%98%e5%b1%9e%e6%80%a7%e6%96%b9%e6%b3%95%e4%bb%8b%e7%bb%8d">1.3.2 TheodoOperation 成员属性/方法介绍：</h4>
+<p>通过TheodoOperation::op_Theodo()方法的重载实现对全站仪对象的操作；</p>
+<p>方法：
+int TheodoOperation::op_Theodo(Theodo&amp; in_theodo, int (*func)(...), ...);<br>
+功能：将命令以及参数发送给全站仪；<br>
+输入参数：</p>
+<pre><code class="language-C++"><div>    <span class="hljs-comment">/*
+     * 操作方法： 将要发送的命令以函数指针方式传参, 并将参数依次传递即可；
+     * 详见使用范例；
+     */</span>
+
+    Theodo&amp; in_theodo <span class="hljs-comment">//  全站仪对象；</span>
+    <span class="hljs-keyword">int</span> (*func)(...) <span class="hljs-comment">// 成员方法指针；</span>
+
+</div></code></pre>
+<p>输出参数： 详见各重载函数声明 theodooperation.h；</p>
+<hr>
+<h2 id="2-%e4%bd%bf%e7%94%a8%e8%8c%83%e4%be%8b">2. 使用范例：</h2>
+<pre><code class="language-C++"><div><span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;QCoreApplication&gt;</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">"theodooperation.h"</span></span>
+<span class="hljs-meta">#<span class="hljs-meta-keyword">include</span> <span class="hljs-meta-string">&lt;iostream&gt;</span></span>
+
+<span class="hljs-keyword">using</span> <span class="hljs-keyword">namespace</span> <span class="hljs-built_in">std</span>;
+
+<span class="hljs-function"><span class="hljs-keyword">int</span> <span class="hljs-title">main</span><span class="hljs-params">()</span>
+</span>{
+    <span class="hljs-comment">// 1. 构造一个Theodo类的全站仪对象：</span>
+    Theodo Ts60;
+    <span class="hljs-comment">// 2. 构造一个操作函数TheodoOperation类的对象，用于操作全站仪；</span>
+    TheodoOperation op;
+    <span class="hljs-comment">// 3. 若需记录坐标，可构造一个List对象；</span>
+    <span class="hljs-comment">//    由于全站仪返回的坐标为(r, θ, φ)格式， 本API中提供了两种返回方式；</span>
+    <span class="hljs-comment">//    方式1：直接返回全站仪给出的(r, θ, φ) 坐标；</span>
+    <span class="hljs-comment">//    方式2：返回(x, y, z) 坐标；</span>
+    <span class="hljs-comment">//    可根据需要调用不同的 op_Theodo()函数重载；</span>
+    <span class="hljs-comment">//    本例中采用(x, y, z) 坐标方式；</span>
+    QList&lt;<span class="hljs-built_in">std</span>::tuple&lt;<span class="hljs-keyword">double</span>, <span class="hljs-keyword">double</span>,<span class="hljs-keyword">double</span>&gt;&gt; coordinations;
+
+    <span class="hljs-comment">// 设置跟踪方式：</span>
+    op.op_Theodo(TS60, &amp;Theodo::AUS_SetUserLockStat, Theodo::ON );
+    system(<span class="hljs-string">"pause"</span>);
+
+    <span class="hljs-comment">// 设置超级搜索使能：</span>
+    op.op_Theodo(TS60, &amp;Theodo::AUT_PS_EnableRange, Theodo::ENABLE);
+    system(<span class="hljs-string">"pause"</span>);
+
+    <span class="hljs-comment">// 进行超级搜索:</span>
+    op.op_Theodo(TS60, &amp;Theodo::AUT_PS_SearchWindow);
+    system(<span class="hljs-string">"pause"</span>);
+
+    <span class="hljs-comment">//工作循环：</span>
+    <span class="hljs-keyword">while</span>(<span class="hljs-number">1</span>)
+    {
+
+        <span class="hljs-keyword">double</span> x = <span class="hljs-number">0</span>, y = <span class="hljs-number">0</span>, z = <span class="hljs-number">0</span>;
+
+        <span class="hljs-comment">// 测量距离和角度：        </span>
+		op.op_Theodo(TS60, &amp;Theodo::BAP_MeasDistanceAngle, Theodo::BAP_DEF_DIST, x, y, z);
+        <span class="hljs-comment">// 保存测量结果：</span>
+		coordinations.append(<span class="hljs-built_in">std</span>::tuple&lt;<span class="hljs-keyword">double</span>, <span class="hljs-keyword">double</span>, <span class="hljs-keyword">double</span>&gt;(x, y, z));
+        <span class="hljs-comment">// 打印测量结果：</span>
+        foreach(<span class="hljs-keyword">auto</span> var,  coordinations)
+		{
+			<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"x = "</span> &lt;&lt; get&lt;<span class="hljs-number">0</span>&gt;(var) &lt;&lt; <span class="hljs-built_in">endl</span>; 
+			<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"y = "</span> &lt;&lt; get&lt;<span class="hljs-number">1</span>&gt;(var) &lt;&lt; <span class="hljs-built_in">endl</span>; 
+			<span class="hljs-built_in">std</span>::<span class="hljs-built_in">cout</span> &lt;&lt; <span class="hljs-string">"z = "</span> &lt;&lt; get&lt;<span class="hljs-number">2</span>&gt;(var) &lt;&lt; <span class="hljs-built_in">endl</span>; 
+		}
+		system(<span class="hljs-string">"pause"</span>);
+    }
+    <span class="hljs-keyword">return</span> <span class="hljs-number">0</span>;
+}
+</div></code></pre>
+
+    </body>
+    </html>
