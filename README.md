@@ -1,9 +1,30 @@
 [toc]
 # Theodooperation 类使用说明
 
-## 摘要：  
+## 0. 摘要：  
 TheodoOperation的作用是通过本类的成员方法自动操作Leica系列全站仪，本类中的方法是通过将Leica GeoCom工具包中的ASCII命令进行二次封装，并通过TCP方式发送。
 
+### 0.1 硬件连接：
+DTU连接TCP/IP终端（工控机）与串口终端（全站仪)，解析并转发数据报文；  
+工控机通过TCP/IP方式与DTU进行连接；  
+全站仪通过RS232方式与DTU进行连接;
+  
+![硬件连接](./Pics/Hardware.jpg)
+
+WLAN参数：
+ - Server: DTU
+ - Server IP: 192.168.1.1
+ - Server Port: 10010
+ - Client: 工控机
+ - Client IP 192.168.1.20
+
+串口参数：
+- 波特率： 115200
+- 数据位： 8
+- 校验位： None
+- 停止位： 1
+
+### 0.2 软件应用：
 为保证本类对象的正常运行，项目中须包含以下依赖：
 - Theodo 类（theodo.h, theodo.cpp)；
 - DTUOperation 类(dtuoperation.h, dtuoperation.cpp)；
